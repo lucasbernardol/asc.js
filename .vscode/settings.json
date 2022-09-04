@@ -1,5 +1,8 @@
 {
   "material-icon-theme.files.associations": {
     "vitest.config.ts": "Vite"
+  },
+  "material-icon-theme.folders.associations": {
+    "mathematics": "Functions"
   }
 }

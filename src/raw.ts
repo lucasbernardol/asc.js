@@ -5,13 +5,15 @@ const RESOLUTION_REGULAR_EXPRESSION =
 const PROPORTION_REGULAR_EXPRESSION =
   /(?<screen_proportion>^(?<width>\d{1,3}):(?<height>\d{1,3})$)/i;
 
-const FUNCTION_STRICT_TYPE = '[object Function]';
-const STRING_STRICT_TYPE = '[object String]';
+const FUNCTION_STRICT_TYPE = "[object Function]";
+const STRING_STRICT_TYPE = "[object String]";
 
-const SQUARE_PROPORTION = '1:1';
+const SQUARE_PROPORTION = "1:1";
 const PERFECT_SQUARE_INT = 1;
 
-const PROPORTION_DELIMITER = ':';
+const PROPORTION_DELIMITER = ":";
+
+// -----------------
 
 const ORIENTATION_ENUM = (key: OrientationEnumKeys): string => Orientation[key];
 
@@ -19,15 +21,15 @@ const ORIENTATION_ENUM = (key: OrientationEnumKeys): string => Orientation[key];
  * Global types
  */
 enum Orientation {
-  'LANDSCAPE' = 'LANDSCAPE', // paisagem
-  'PORTRAIT' = 'PORTRAIT', // retrato
-  'UNKNOWN' = 'UNKNOWN',
+  "LANDSCAPE" = "LANDSCAPE", // paisagem
+  "PORTRAIT" = "PORTRAIT", // retrato
+  "UNKNOWN" = "UNKNOWN",
 }
 
 type OrientationEnumKeys = keyof typeof Orientation;
 
 /**
- * - Utils
+ * - Utils --------------
  */
 const _Prototype = () => Object.prototype;
 const _NumberPrototype = () => Number.prototype;
@@ -44,13 +46,13 @@ const parser = <T = any>(to: Partial<T>, from: T): T =>
   Object.assign({}, to, from);
 
 /**
- * - Numbers
+ * - Numbers ----------------
  */
 const toDigitsString = (value: number, digits: number = 5) =>
   _NumberPrototype().toFixed.call(value, digits);
 
 /**
- * - Formating
+ * - Formating ---------------
  */
 const formatAspectRatioString = (w: number, h: number, delimiter: string) =>
   `${w}${delimiter}${h}`;
@@ -74,9 +76,9 @@ const _safeOrientationByEnum = (ratio: number): OrientationEnumKeys => {
   const orientation =
     ratio && !isNaN(ratio)
       ? ratio > 1
-        ? ORIENTATION_ENUM('LANDSCAPE')
-        : ORIENTATION_ENUM('PORTRAIT')
-      : ORIENTATION_ENUM('UNKNOWN');
+        ? ORIENTATION_ENUM("LANDSCAPE")
+        : ORIENTATION_ENUM("PORTRAIT")
+      : ORIENTATION_ENUM("UNKNOWN");
 
   return orientation as OrientationEnumKeys;
 };
@@ -84,7 +86,7 @@ const _safeOrientationByEnum = (ratio: number): OrientationEnumKeys => {
 /**
  * - Sorting Arrays
  */
-type SortOrderOptional = 'desc' | 'asc';
+type SortOrderOptional = "desc" | "asc";
 
 type SortBySpecificOrderOptions = {
   order?: SortOrderOptional;
@@ -92,10 +94,10 @@ type SortBySpecificOrderOptions = {
 
 const sortBySpecificOrder = <T = any>(
   sortArr: number[],
-  { order }: SortBySpecificOrderOptions = { order: 'desc' }
+  { order }: SortBySpecificOrderOptions = { order: "desc" }
 ): T => {
   function sortableCallbackFn(a: number, b: number): number {
-    const isDesc = order === 'desc';
+    const isDesc = order === "desc";
 
     return isDesc ? b - a : a - b;
   }
@@ -107,7 +109,7 @@ const sortBySpecificOrder = <T = any>(
  * Aspect ration/proportion
  *  Example: 16:9, 21:9 ....
  */
-type GreatestCommonDivisorAlgorithmType = 'RECURSION' | 'INTERATOR';
+type GreatestCommonDivisorAlgorithmType = "RECURSION" | "INTERATOR";
 
 const greatestCommonDivisorByRecursion = (
   width: number,
@@ -176,13 +178,13 @@ function greatestCommonDivisorInterator(
 const gratestAlgorithmRef = (
   algorithmType: GreatestCommonDivisorAlgorithmType
 ) => {
-  return algorithmType === 'INTERATOR'
+  return algorithmType === "INTERATOR"
     ? greatestCommonDivisorByRecursion
     : greatestCommonDivisorByInterator;
 };
 
 /**
- * Estimated aspect ratio.
+ * Estimated aspect ratio. ------------
  */
 type AspectRatioStimatedOptions = {
   width: number;
@@ -193,7 +195,7 @@ type AspectRatioStimatedOptions = {
 
 const APROXIMATE_BASE_OPTIONS: Partial<AspectRatioStimatedOptions> = {
   delimiter: PROPORTION_DELIMITER,
-  gcd_type: 'INTERATOR',
+  gcd_type: "INTERATOR",
 };
 
 const _aproximateAspectRatio = (options: AspectRatioStimatedOptions) => {
@@ -254,15 +256,15 @@ type RationOutput = {
   };
 };
 
-type RatioDimensions = Pick<RatioOptions, 'width' | 'height'>;
-type RatioSorting = Pick<RatioOptions, 'sorting_dimensions' | 'sorting_order'>;
+type RatioDimensions = Pick<RatioOptions, "width" | "height">;
+type RatioSorting = Pick<RatioOptions, "sorting_dimensions" | "sorting_order">;
 type RatioParserDimensions = [number, number];
 
 const RATION_BASE_OPTIONS: Partial<RatioOptions> = {
   width: 1,
   height: 1,
-  gcd_type: 'INTERATOR',
-  sorting_order: 'desc',
+  gcd_type: "INTERATOR",
+  sorting_order: "desc",
   sorting_dimensions: false,
   proportion_delimiter: PROPORTION_DELIMITER,
 };
@@ -292,7 +294,7 @@ const resolutionParser = (
 ): RatioParserDimensions => {
   const matches = str.match(RESOLUTION_REGULAR_EXPRESSION);
 
-  if (!matches) throw new Error('Resolution does not matches.');
+  if (!matches) throw new Error("Resolution does not matches.");
 
   const _OPTIONS: SortBySpecificOrderOptions = { order: sorting_order };
 
@@ -302,7 +304,7 @@ const resolutionParser = (
   const dimensionsEntries = Object.entries(dimentionsGroups);
 
   const dimensions = dimensionsEntries.filter(
-    ([key, _]) => key !== 'resolution'
+    ([key, _]) => key !== "resolution"
   );
 
   const dimensionIntegers = dimensions.map(([_, value]) => {
@@ -429,7 +431,7 @@ const proportionToRatio = <T = any>(
 
 console.time();
 
-const aspect = proportionToRatio('16:9');
+const aspect = proportionToRatio("16:9");
 
 console.timeEnd();
 
