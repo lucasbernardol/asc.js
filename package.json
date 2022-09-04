@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "postinstall": "npx husky install",
     "test": "vitest --config vitest.config.ts",
     "test:tape": "npx tsnd --transpile-only --respawn ./node_modules/tape/bin/tape src/__tests__/**/*.spec.ts"
   },

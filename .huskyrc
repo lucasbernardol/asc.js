@@ -1,5 +1,0 @@
-{
-  "hooks": {
-    "commit-msg": "npx --no --commitlint --edit"
-  }
-}
