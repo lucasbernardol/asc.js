@@ -408,6 +408,7 @@ const data = ratio({
 console.timeEnd('Ratio');
 console.log({ data }); */
 
+/*
 type ProprotionStringToAspectRatio = `${number}x${number}`;
 
 const proportionToRatio = <T = any>(
@@ -436,3 +437,4 @@ const aspect = proportionToRatio("16:9");
 console.timeEnd();
 
 console.log({ aspect });
+*/

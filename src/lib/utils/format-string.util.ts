@@ -1,6 +1,13 @@
+//import { format } from "node:util";
+
 // formating
-export const formatAspectRatio = (w: number, h: number, d: string) =>
-  `${w}${d}${h}`;
+export const formatAspectRatioText = (
+  w: number,
+  h: number,
+  d: string
+): string => {
+  return `${w}${d}${h}`;
+};
 
 export const formatResolutionString = (w: number, h: number) => `${w}x${h}`;
 

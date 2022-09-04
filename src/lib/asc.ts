@@ -7,7 +7,7 @@ import { PROPORTION_DELIMITER } from "../constants/string.constants";
 import { PROPORTION_REGULAR_EXPRESSION } from "../constants/regexp.constants";
 
 import { parser } from "./utils/parser-options.util";
-import { formatAspectRatio } from "./utils/format-string.util";
+import { formatAspectRatioText } from "./utils/format-string.util";
 import { type } from "os";
 
 /**
@@ -45,7 +45,7 @@ const _aproximateAspectRatioText = (
   //const left: number = width / divisor;
   //const right: number = height / divisor;
 
-  return formatAspectRatio(
+  return formatAspectRatioText(
     width / divisor,
     height / divisor,
     delimiter as string
@@ -55,27 +55,28 @@ const _aproximateAspectRatioText = (
 /**
  * - Aspect ratio string `16:9` to ratio.
  */
-
-type AspectRatioProportionOption = {
+type AspectToIntegerOptions = {
   otherDelimiter?: boolean;
   delimiter?: string;
 };
 
-export const aspectProportionToInteger = <Delimiter = string>(
+const ASPECT_PROPORTION_INTEGER_BASE: Partial<AspectToIntegerOptions> = {
+  delimiter: PROPORTION_DELIMITER,
+  otherDelimiter: false,
+};
+
+export const aspectToInteger = <Delimiter = string>(
   aspect: Delimiter,
-  options: AspectRatioProportionOption = {}
+  options: AspectToIntegerOptions = {}
 ): number | -1 => {
-  const { otherDelimiter, delimiter } = parser<AspectRatioProportionOption>(
-    {
-      otherDelimiter: false,
-      delimiter: PROPORTION_DELIMITER,
-    },
+  const { delimiter, otherDelimiter } = parser<AspectToIntegerOptions>(
+    ASPECT_PROPORTION_INTEGER_BASE,
     options
   );
 
-  const matches: boolean = !otherDelimiter
-    ? PROPORTION_REGULAR_EXPRESSION.test(aspect as any)
-    : true;
+  const _withExpression = (v: string) => PROPORTION_REGULAR_EXPRESSION.test(v);
+
+  const matches = !otherDelimiter ? _withExpression(aspect as any) : true;
 
   if (matches) {
     const aspects = (aspect as unknown as string).split(delimiter as string);
@@ -83,9 +84,9 @@ export const aspectProportionToInteger = <Delimiter = string>(
     const [width, height] = aspects.map((aspect) => parseInt(aspect, 10));
 
     return width / height;
-  } else {
-    return -1;
   }
+
+  return -1;
 };
 
 export {};
