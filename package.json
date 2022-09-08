@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "vitest --config vitest.config.ts",
+    "test": "vitest --config vitest.config.ts"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.1.2",
