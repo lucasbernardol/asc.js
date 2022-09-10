@@ -1,11 +1,11 @@
-import { assert, describe, it } from "vitest";
+import { describe, expect, it } from 'vitest';
 
-import { PROPORTION_DELIMITER } from "../dist/constants/string.constants";
+import { PROPORTION_DELIMITER } from '../dist/lib/constants';
 
-describe("#Aspect-ratio suite with dist/build .JS files.", () => {
-  it("should be compare aspect-ration #PROPROTION_DELIMITER constant.", () => {
-    const expected: string = ":"; // "16:9"
+describe('#Aspect-ratio suite with dist/build .JS files.', () => {
+  it('should be able compare "PROPROTION_DELIMITER" with: ":".', () => {
+    const _EXPECTED: string = ':'; // "16:9"
 
-    assert.deepEqual(PROPORTION_DELIMITER, expected);
+    expect(PROPORTION_DELIMITER).toStrictEqual(_EXPECTED);
   });
 });

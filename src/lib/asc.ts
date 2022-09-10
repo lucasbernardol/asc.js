@@ -1,75 +1,58 @@
-import util from 'node:util';
+import { algorithmRef, GreatestType } from './functions/greatest.math';
+import { parser } from './utils/parser.util';
+
+import * as _Sorter from './utils/sorter.util';
+import * as _Prototype from './utils/prototype.util';
+import * as Formatter from './utils/formatters.util';
 
 import {
-  algorithmRef,
-  GreatestCommonDivisorAlgorithmType,
-} from './mathematics/greatest-algorithm.math';
-
-import {
-  PERFECT_SQUARE_INT,
+  PERFECT_SQUARE_INTEGER,
   PROPORTION_DELIMITER,
-  SQUARE_PROPORTION,
-} from '../constants/string.constants';
-
-import {
   PROPORTION_REGULAR_EXPRESSION,
   RESOLUTION_REGULAR_EXPRESSION,
-} from '../constants/regexp.constants';
-
-import { parser } from './utils/parser-options.util';
-
-import {
-  sortingBySpecificOrder,
-  SortingOptions,
-  SortingOrderType,
-} from './utils/sorting-arrays.util';
-
-import {
-  formatAspectRatioText,
-  formatPixelsString,
-  formatResolutionString,
-} from './utils/format-string.util';
-
-import {
-  isStrictFunction,
-  isStrictString,
-  toDigitsString,
-} from './utils/prototype-functions.utils';
-
-import {
-  ORIENTATION_ENUM_KEYS,
-  ORIENTATION_ENUM,
-} from './types/enums/orientation.enum';
+  SQUARE_PROPORTION,
+  MEGAPIXELS_AMOUNT,
+  MEGAPIXELS_SUFFIX,
+} from './constants';
 
 /**
- * - Aproximate `aspect ratio` text.
+ * Global types
  */
-type AproximateAspectRatioTextOptions = {
-  width: number;
-  height: number;
-  delimiter?: string;
-  gcdType: GreatestCommonDivisorAlgorithmType;
-};
+export enum ORIENTATION_ENUM {
+  'SQUARE' = 'SQUARE',
+  'LANDSCAPE' = 'LANDSCAPE',
+  'PORTRAIT' = 'PORTRAIT',
+  'UNKNOWN' = 'UNKNOWN',
+}
 
-const APROXIMATE_BASE_OPTIONS: Partial<AproximateAspectRatioTextOptions> = {
-  delimiter: PROPORTION_DELIMITER,
-  gcdType: 'INTERATOR',
-};
+export type ORIENTATION_ENUM_KEYS = keyof typeof ORIENTATION_ENUM;
 
 /**
  * - Utils
  */
+export type AproximateAspectRatioTextOptions = {
+  width: number;
+  height: number;
+  delimiter?: string;
+  greatest_algorithm_type: GreatestType;
+};
+
+const APROXIMATE_BASE_OPTIONS: Partial<AproximateAspectRatioTextOptions> = {
+  delimiter: PROPORTION_DELIMITER,
+  greatest_algorithm_type: 'INTERATOR',
+};
+
 const _aproximateAspectRatioText = (
   options: AproximateAspectRatioTextOptions
 ): { proportion_text: string; proportion_amount: number } => {
-  const { width, height, delimiter, gcdType } =
+  const { width, height, delimiter, greatest_algorithm_type } =
     parser<AproximateAspectRatioTextOptions>(APROXIMATE_BASE_OPTIONS, options);
 
-  const greatestDivisorFn = algorithmRef(gcdType);
+  const greatestDivisorFn = algorithmRef(greatest_algorithm_type);
 
   const proportion_amount = greatestDivisorFn(width, height);
 
-  if (proportion_amount === PERFECT_SQUARE_INT /* 1 */) {
+  if (proportion_amount === PERFECT_SQUARE_INTEGER /* 1 */) {
     const proportion_text = SQUARE_PROPORTION.replace(
       PROPORTION_DELIMITER,
       delimiter as string
@@ -78,7 +61,7 @@ const _aproximateAspectRatioText = (
     return { proportion_text, proportion_amount };
   }
 
-  const proportion_text = formatAspectRatioText(
+  const proportion_text = Formatter.formatAspectRatioText(
     width / proportion_amount,
     height / proportion_amount,
     delimiter as string
@@ -89,23 +72,24 @@ const _aproximateAspectRatioText = (
 
 const _safeOrientationByEnum = (ratio: number): ORIENTATION_ENUM_KEYS => {
   /**
-   * x = 1 - SQUARE
-   * x > 1 - LANDSCAPE
-   * x < 1 - PORTRAIT
-   * x == NaN = UNKNOW
+   * aspect == NaN = UNKNOW
+   *
+   * aspect = 1 - SQUARE
+   * aspect > 1 - LANDSCAPE
+   * aspect < 1 - PORTRAIT
    */
-  const aspect = Math.abs(ratio);
+  const aspect_ratio = Math.abs(ratio);
 
-  const isAspectNaN: boolean = isNaN(aspect);
+  const isAspectRatioNaN: boolean = isNaN(aspect_ratio);
 
-  if (isAspectNaN) {
+  if (isAspectRatioNaN) {
     return ORIENTATION_ENUM['UNKNOWN'];
   }
 
   // prettier-ignore
-  return aspect === 1 
+  return aspect_ratio === 1 
     ? (ORIENTATION_ENUM['SQUARE']) 
-    : (aspect > 1 ? 
+    : (aspect_ratio > 1 ? 
     ORIENTATION_ENUM['LANDSCAPE'] : 
     ORIENTATION_ENUM['PORTRAIT']
   )
@@ -116,34 +100,36 @@ const _safeCallbackExecution = <T = any>(
   context: any,
   d: T
 ) => {
-  return isStrictFunction(callback) ? callback.apply(context, []) : d;
+  return _Prototype.isStrictFunction(callback)
+    ? callback.apply(context, [])
+    : d;
 };
 
 /**
- * - Aspect ratio string `16:9` to ratio.
+ *  @description Converts `proportion` to integer value.
  */
-type AspectToIntegerOptions = {
-  otherDelimiter?: boolean;
+export type AspectToIntegerOptions = {
+  another_delimiter?: boolean;
   delimiter?: string;
 };
 
 const ASPECT_PROPORTION_INTEGER_BASE: Partial<AspectToIntegerOptions> = {
+  another_delimiter: false,
   delimiter: PROPORTION_DELIMITER,
-  otherDelimiter: false,
 };
 
-export const aspectToInteger = <Delimiter = string>(
+export function aspectToInteger<Delimiter = string>(
   aspect: Delimiter,
   options: AspectToIntegerOptions = {}
-): number | -1 => {
-  const { delimiter, otherDelimiter } = parser<AspectToIntegerOptions>(
+): number | -1 {
+  const { delimiter, another_delimiter } = parser<AspectToIntegerOptions>(
     ASPECT_PROPORTION_INTEGER_BASE,
     options
   );
 
   const _withExpression = (v: string) => PROPORTION_REGULAR_EXPRESSION.test(v);
 
-  const matches = !otherDelimiter ? _withExpression(aspect as any) : true;
+  const matches = !another_delimiter ? _withExpression(aspect as any) : true;
 
   if (matches) {
     const aspects = (aspect as unknown as string).split(delimiter as string);
@@ -154,25 +140,21 @@ export const aspectToInteger = <Delimiter = string>(
   }
 
   return -1;
-};
+}
 
 /**
  * - Image aspect ratio.
  */
-type RatioDimensionCallback = number | ((...args: any) => number);
-type RatioResolution = `${number}x${number}`;
+type RatioDimensionCallback = number | (() => number);
 
 type RatioOptions = {
   width?: RatioDimensionCallback;
   height?: RatioDimensionCallback;
   resolution?: RatioResolution;
-  /**
-   * @default ":"
-   */
-  gcdType?: GreatestCommonDivisorAlgorithmType;
-  proportionDelimiter?: string;
-  sortingOrder?: SortingOrderType;
-  sortingDimensions?: boolean;
+  sorting_order?: _Sorter.SortingOrderType;
+  sorting_dimensions?: boolean;
+  proportion_delimiter?: string;
+  greatest_algorithm_type?: GreatestType;
 };
 
 type RatioOutput = {
@@ -193,19 +175,17 @@ type RatioOutput = {
   orientation: ORIENTATION_ENUM_KEYS;
 };
 
-type RatioDimensions = Pick<RatioOptions, 'width' | 'height'>;
-
-type RatioSorting = Pick<RatioOptions, 'sortingDimensions' | 'sortingOrder'>;
-
 type RatioParserDimensions = [number, number];
+
+type RatioResolution = `${number}x${number}`;
 
 const RATION_BASE_OPTIONS: Partial<RatioOptions> = {
   width: 1,
   height: 1,
-  gcdType: 'INTERATOR',
-  sortingOrder: 'desc',
-  sortingDimensions: false,
-  proportionDelimiter: PROPORTION_DELIMITER,
+  sorting_order: 'desc',
+  sorting_dimensions: false,
+  proportion_delimiter: PROPORTION_DELIMITER,
+  greatest_algorithm_type: 'INTERATOR',
 };
 
 const callbacksParser = <T = any>({
@@ -229,29 +209,33 @@ type DimensionsGroupsRegexp = {
 
 const _parserToResolution = (
   str: string,
-  { sortingOrder, sortingDimensions }: RatioSorting
+  {
+    sorting_order,
+    sorting_dimensions,
+  }: Pick<RatioOptions, 'sorting_order' | 'sorting_dimensions'>
 ): RatioParserDimensions => {
   const matches = str.match(RESOLUTION_REGULAR_EXPRESSION);
 
   if (!matches) throw new Error('Resolution does not matches.');
 
-  const _OPTIONS: SortingOptions = { order: sortingOrder };
+  const _OPTIONS: _Sorter.SortingOptions = { order: sorting_order };
 
-  /** es2018 */
+  // ES2018
   const dimentionsGroups = matches?.groups as DimensionsGroupsRegexp;
 
   const dimensionsEntries = Object.entries(dimentionsGroups);
 
-  const dimensions = dimensionsEntries.filter(
-    ([key, _]) => key !== 'resolution'
-  );
+  const dimensions = dimensionsEntries.filter(([key]) => key !== 'resolution');
 
   const dimensionIntegers = dimensions.map(([_, value]) => {
     return parseInt(value, 10);
   }) as [number, number];
 
-  return sortingDimensions
-    ? sortingBySpecificOrder<RatioParserDimensions>(dimensionIntegers, _OPTIONS)
+  return sorting_dimensions
+    ? _Sorter.sortingBySpecificOrder<RatioParserDimensions>(
+        dimensionIntegers,
+        _OPTIONS
+      )
     : dimensionIntegers;
 };
 
@@ -260,15 +244,21 @@ const _parserToResolution = (
  *   Serialize `width` and `height` properties.
  */
 const _parserToDimensions = (
-  dimensions: RatioDimensions,
-  { sortingDimensions, sortingOrder }: RatioSorting
+  dimensions: Partial<RatioOptions>,
+  {
+    sorting_order,
+    sorting_dimensions,
+  }: Pick<RatioOptions, 'sorting_order' | 'sorting_dimensions'>
 ): RatioParserDimensions => {
-  const _OPTIONS: SortingOptions = { order: sortingOrder };
+  const _OPTIONS: _Sorter.SortingOptions = { order: sorting_order };
 
   const dimensionsArray = callbacksParser(dimensions);
 
-  return sortingDimensions
-    ? sortingBySpecificOrder<RatioParserDimensions>(dimensionsArray, _OPTIONS)
+  return sorting_dimensions
+    ? _Sorter.sortingBySpecificOrder<RatioParserDimensions>(
+        dimensionsArray,
+        _OPTIONS
+      )
     : dimensionsArray;
 };
 
@@ -299,27 +289,22 @@ function pixelsSuffix(amount: number): {
   return { amount, pixels_suffix, sizes };
 }
 
-const _unitFormatter = (left: unknown, right: unknown): string =>
-  util.format('%s %s', left, right);
-
 /**
  * @description Calculate aspect ratio.
  */
 export function ratio(options: RatioOptions): RatioOutput {
   const {
-    sortingDimensions,
-    proportionDelimiter,
-    gcdType,
-    sortingOrder,
+    sorting_order,
+    sorting_dimensions,
+    proportion_delimiter,
+    greatest_algorithm_type,
     resolution,
     ...dimensions
   } = parser<RatioOptions>(RATION_BASE_OPTIONS, options);
 
-  const _MEGAPIXELS_AMOUNT = 1_000_000; // 1e6 - 1000000
+  const _SORT = { sorting_dimensions, sorting_order };
 
-  const _SORT = { sortingDimensions, sortingOrder };
-
-  const isResolution: boolean = isStrictString(resolution);
+  const isResolution: boolean = _Prototype.isStrictString(resolution);
 
   const [width, height] = isResolution
     ? _parserToResolution(resolution as any, _SORT)
@@ -336,20 +321,22 @@ export function ratio(options: RatioOptions): RatioOutput {
 
   const _amount = amount.toLocaleString();
 
-  const pixels_unit = _unitFormatter(_amount, pixels_suffix);
+  const pixels_unit = Formatter._unitFormatter(_amount, pixels_suffix);
 
   /**
    * - Megapixels
    */
-  const _MEGAPIXELS_SUFFIX = 'MP';
 
-  const _megapixels = (pixels / _MEGAPIXELS_AMOUNT).toFixed(1);
+  const _megapixels = (pixels / MEGAPIXELS_AMOUNT).toFixed(1);
 
   const megapixels = Number.parseFloat(_megapixels);
 
-  const megapixels_unit = _unitFormatter(megapixels, _MEGAPIXELS_SUFFIX);
+  const megapixels_unit = Formatter._unitFormatter(
+    megapixels,
+    MEGAPIXELS_SUFFIX
+  );
 
-  const megapixels_suffix = _MEGAPIXELS_SUFFIX;
+  const megapixels_suffix = MEGAPIXELS_SUFFIX;
 
   /**
    * - Ratio
@@ -357,7 +344,7 @@ export function ratio(options: RatioOptions): RatioOutput {
   const ratio = width / height;
 
   // '1.7777777777' => '1.77778';
-  const aspect_ratio = toDigitsString(ratio, 5);
+  const aspect_ratio = ratio.toString(5);
 
   /**
    * - Proportions
@@ -365,8 +352,8 @@ export function ratio(options: RatioOptions): RatioOutput {
   const _PORPORTION = {
     width,
     height,
-    delimiter: proportionDelimiter,
-    gcdType,
+    delimiter: proportion_delimiter,
+    greatest_algorithm_type,
   };
 
   const { proportion_text, proportion_amount } = _aproximateAspectRatioText(
@@ -376,7 +363,7 @@ export function ratio(options: RatioOptions): RatioOutput {
   // Display orientation
   const orientation: ORIENTATION_ENUM_KEYS = _safeOrientationByEnum(ratio);
 
-  const _resolution = formatResolutionString(width, height);
+  const _resolution = Formatter.formatResolutionString(width, height);
 
   return {
     width,
