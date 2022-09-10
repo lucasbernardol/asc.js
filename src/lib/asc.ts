@@ -8,7 +8,6 @@ import { PROPORTION_REGULAR_EXPRESSION } from "../constants/regexp.constants";
 
 import { parser } from "./utils/parser-options.util";
 import { formatAspectRatioText } from "./utils/format-string.util";
-import { type } from "os";
 
 /**
  * - Aproximate `aspect ratio` text.
