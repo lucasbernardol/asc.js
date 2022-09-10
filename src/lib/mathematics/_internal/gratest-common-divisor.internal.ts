@@ -2,11 +2,11 @@ export const _greatestCommonDivisorByRecursion = (
   width: number,
   height: number
 ): number => {
-  const left = Math.abs(width); // Recursion
+  const left = Math.abs(width);
 
   const right = Math.abs(height);
 
-  return right ? greatestCommonDivisorByRecursion(right, left % right) : left;
+  return right ? _greatestCommonDivisorByRecursion(right, left % right) : left;
 };
 
 export function _greatestCommonDivisorByInterator(
@@ -42,6 +42,3 @@ export function _greatestCommonDivisorByInterator(
 
   return left || right;
 }
-
-//greatestCommonDivisorByRecursion.signature = 'Recursion';
-//greatestCommonDivisorByInterator.signature = 'Interator';

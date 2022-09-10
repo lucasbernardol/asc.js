@@ -1,13 +1,12 @@
 /**
  * Global types
  */
-export enum Orientation {
-  "LANDSCAPE" = "LANDSCAPE", // paisagem
-  "PORTRAIT" = "PORTRAIT", // retrato
-  "UNKNOWN" = "UNKNOWN",
+
+export enum ORIENTATION_ENUM {
+  'SQUARE' = 'SQUARE',
+  'LANDSCAPE' = 'LANDSCAPE',
+  'PORTRAIT' = 'PORTRAIT',
+  'UNKNOWN' = 'UNKNOWN',
 }
 
-export type OrientationEnumKeys = keyof typeof Orientation;
-
-export const ORIENTATION_ENUM_ACCESS = (key: OrientationEnumKeys): string =>
-  Orientation[key];
+export type ORIENTATION_ENUM_KEYS = keyof typeof ORIENTATION_ENUM;

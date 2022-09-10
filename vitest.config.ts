@@ -6,7 +6,7 @@ export default defineConfig({
   test: {
     include: ['__tests__/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     browser: false,
-    silent: true,
+    silent: false,
     cache: {
       dir: resolve(__dirname, '.vitest', 'cache'),
     },

@@ -1,12 +1,12 @@
 import {
   _StrictTypeString,
   _NumberPrototype,
-} from "../../constants/prototype.constants";
+} from '../../constants/prototype.constants';
 
 import {
   FUNCTION_STRICT_TYPE,
   STRING_STRICT_TYPE,
-} from "../../constants/strict-types.constants";
+} from '../../constants/strict-types.constants';
 
 /**
  * - Utils

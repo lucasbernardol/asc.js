@@ -1,7 +1,7 @@
-export type SortingOrderType = "desc" | "asc";
+export type SortingOrderType = 'desc' | 'asc';
 
 export type SortingOptions = {
-  order: SortingOrderType;
+  order?: SortingOrderType;
 };
 
 /**
@@ -12,11 +12,11 @@ export type SortingOptions = {
  */
 export function sortingBySpecificOrder<T = any>(
   arr: number[],
-  { order }: SortingOptions = { order: "desc" }
+  { order }: SortingOptions = { order: 'desc' }
 ): T {
   // sorting
   function sortableCallbackFn(a: number, b: number) {
-    const isDesc = order === "desc";
+    const isDesc = order === 'desc';
 
     return isDesc ? b - a : a - b;
   }
